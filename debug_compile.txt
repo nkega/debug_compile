@@ -1,0 +1,47 @@
+bug_title: problèmes de conflits entre deux fichiers sur ubumtu
+
+En fonction de pourquoi il y'a eu conflit l'erreur pourrait vous afficher: 
+
+brice-dev@brice-dev-B5400:~$ sudo apt update
+[sudo] Mot de passe de brice-dev : 
+E: Des valeurs entrant en conflit ont été renseignées pour l'option Signed-By à propos de la source https://apt.postgresql.org/pub/repos/apt/ mantic-pgdg: /etc/apt/trusted.gpg.d/postgresql-archive-keyring.gpg != /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+E: La liste des sources ne peut être lue.
+
+dans ce cas si il y'a conflit entre deux fichiers de concernant postgresql. 
+maintenant comment resoudre cela?
+
+step 1:
+find /etc/apt -type f -regex ".*\(list\|sources\).*" -exec bash -c 'echo -e "\n\t$1\n" ; [ "${1##*.}" = "list" -o "${1##*.}" = "sources" ] && cat -n "$1"' _ '{}' \;
+
+step 2:
+dpkg -l | grep -v ^ii
+
+step 3:
+cd /etc/apt/sources.list.d && sudo rm -v pgdg.list ; cd
+
+step 4:
+sudo apt clean && sudo apt update
+
+step 5:
+cd /etc/apt/sources.list.d && sudo rm -v pgdg.sources ; cd
+
+step 6:
+sudo apt install -y postgresql-common
+
+step 7:
+sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+
+step 8:
+find /etc/apt -type f -regex ".*\(list\|sources\).*" -exec bash -c 'echo -e "\n\t$1\n" ; [ "${1##*.}" = "list" -o "${1##*.}" = "sources" ] && cat "$1"' _ '{}' \;
+
+step 9:
+sudo apt clean && sudo apt update
+
+step 10:
+sudo apt install --reinstall -y postgresql-common
+
+step 11:
+sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+
+Après ces etapes vous refaite le sudo apt update et vous regarder si cela fonctionne normalement. 
+si non ou pour plus d'aide vous pourrez me contacter directement sur mon mail: njampouabnkegabrice@gmail.com
